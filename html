@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ENERG4 – Mass Flow & TEA Workbook</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    header {
+      background: #111827;
+      color: #f9fafb;
+      padding: 12px 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+    }
+    header p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .toolbar {
+      margin-top: 8px;
+    }
+    .toolbar button {
+      font-size: 12px;
+      padding: 4px 10px;
+      margin-right: 6px;
+      border-radius: 4px;
+      border: 1px solid #4b5563;
+      background: #1f2937;
+      color: #f9fafb;
+      cursor: pointer;
+    }
+    .toolbar button:hover {
+      background: #374151;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+    nav.sidebar {
+      width: 260px;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 10px 0;
+      overflow-y: auto;
+    }
+    .step-link {
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .step-link:hover {
+      background: #1f2937;
+    }
+    .step-link.active {
+      background: #f9fafb;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    main.content {
+      flex: 1;
+      padding: 16px 18px 40px;
+      overflow-x: auto;
+    }
+    section.step {
+      display: none;
+    }
+    section.step.active {
+      display: block;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+    h3 {
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+    .note {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1400px;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 5px 6px;
+      white-space: nowrap;
+    }
+    th {
+      background: #f3f4f6;
+      text-align: left;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+    tr.section-header td {
+      background: #e5e7eb;
+      font-weight: 700;
+    }
+    input[type="number"],
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      font-size: 11px;
+      padding: 3px 4px;
+      border-radius: 3px;
+      border: 1px solid #d1d5db;
+    }
+    input[type="number"] { text-align: right; }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 1px solid #2563eb;
+      border-color: #2563eb;
+    }
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 4px 0 10px;
+      gap: 8px;
+    }
+    .summary-card {
+      background: #ffffff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      border-left: 4px solid #2563eb;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      font-size: 12px;
+      min-width: 180px;
+    }
+    .summary-card strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+    .small {
+      font-size: 11px;
+      color: #4b5563;
+    }
+    .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: #e5e7eb;
+      margin-left: 4px;
+    }
+    .btn-inline {
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      border: 1px solid #9ca3af;
+      background: #e5e7eb;
+      cursor: pointer;
+    }
+    .btn-inline:hover {
+      background: #d1d5db;
+    }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+
+    @media print {
+      nav.sidebar, header, .toolbar {
+        display: none !important;
+      }
+      main.content {
+        padding: 0;
+      }
+      section.step {
+        display: block !important;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ENERG4 – Mass Flow &amp; TEA Workbook</h1>
+  <p>Full workbook: Project → Mass Flow → Valuation → Schedule → CAPEX → OPEX → Financials → Investor → Exports.</p>
+  <div class="toolbar">
+    <button id="btnExportHtml">Download HTML Snapshot</button>
+    <button id="btnExportMd">Download Markdown Summary</button>
+    <button id="btnExportJson">Download Scenario JSON</button>
+    <button id="btnPrint">Print / PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="step-link active" data-step="step1">Step 1 – Project / Feed / GO</div>
+    <div class="step-link" data-step="step2">Step 2 – Element Mass Flow</div>
+    <div class="step-link" data-step="step3">Step 3 – Valuation &amp; Reserves</div>
+    <div class="step-link" data-step="step4">Step 4 – Production Schedule</div>
+    <div class="step-link" data-step="step5">Step 5 – CAPEX (TEA)</div>
+    <div class="step-link" data-step="step6">Step 6 – OPEX</div>
+    <div class="step-link" data-step="step7">Step 7 – Income &amp; Ratios</div>
+    <div class="step-link" data-step="step8">Step 8 – 10-Year Cash Flow</div>
+    <div class="step-link" data-step="step9">Step 9 – Investor Waterfall</div>
+  </nav>
+
+  <main class="content">
+    <!-- STEP 1 -->
+    <section id="step1" class="step active">
+      <h2>Step 1 – Project Parameters, Feed &amp; Graphene Oxide</h2>
+      <div class="note">
+        Minimal inputs: project meta, feed mtpd, runtime, global recovery, reserves, fixed carbon &amp; GO settings.
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Category</th>
+          <th>Parameter</th>
+          <th class="text-center">Value</th>
+          <th>Unit</th>
+          <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="section-header"><td colspan="5">Project Meta</td></tr>
+        <tr>
+          <td>Meta</td>
+          <td>Project Name</td>
+          <td><input type="text" id="projName" value="Fed No 2 Mine Pilot Plant" /></td>
+          <td>–</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Meta</td>
+          <td>Location</td>
+          <td><input type="text" id="projLocation" value="West Virginia, USA" /></td>
+          <td>–</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Meta</td>
+          <td>Matrix Type</td>
+          <td><input type="text" id="projMatrix" value="Coal Refuse" /></td>
+          <td>–</td>
+          <td>Coal refuse, ash, tailings, clays, etc.</td>
+        </tr>
+
+        <tr class="section-header"><td colspan="5">Feed &amp; Runtime</td></tr>
+        <tr>
+          <td>Feed</td>
+          <td>Feed Rate (design)</td>
+          <td><input type="number" id="feedMtpd" value="500" step="1" /></td>
+          <td>mt/day</td>
+          <td>Primary sizing input (can be inferred from CAPEX or set directly).</td>
+        </tr>
+        <tr>
+          <td>Runtime</td>
+          <td>Operating Hours / Day</td>
+          <td><input type="number" id="hoursPerDay" value="24" step="1" /></td>
+          <td>h/day</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Runtime</td>
+          <td>Operating Days / Year</td>
+          <td><input type="number" id="daysPerYear" value="330" step="1" /></td>
+          <td>days/yr</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Feed (derived)</td>
+          <td>Feed mt/hr</td>
+          <td class="text-right" id="outFeedMtph">0</td>
+          <td>mt/hr</td>
+          <td>Derived from mtpd ÷ hours/day.</td>
+        </tr>
+        <tr>
+          <td>Feed (derived)</td>
+          <td>Annual Throughput</td>
+          <td class="text-right" id="outFeedMtpy">0</td>
+          <td>mt/yr</td>
+          <td>mtpd × days/year.</td>
+        </tr>
+
+        <tr class="section-header"><td colspan="5">Recovery &amp; Reserves</td></tr>
+        <tr>
+          <td>Recovery</td>
+          <td>Global Recovery (default)</td>
+          <td><input type="number" id="globalRecoveryPct" value="80" step="1" /></td>
+          <td>%</td>
+          <td>Used for elements where row-level recovery is blank.</td>
+        </tr>
+        <tr>
+          <td>Reserves</td>
+          <td>Total Reserves Feed</td>
+          <td><input type="number" id="reservesMt" value="34000000" step="1000" /></td>
+          <td>mt feed</td>
+          <td>Used for reserve tonnage &amp; value in Step 3.</td>
+        </tr>
+
+        <tr class="section-header"><td colspan="5">Fixed Carbon &amp; Graphene Oxide (GO)</td></tr>
+        <tr>
+          <td>Fixed C</td>
+          <td>Fixed Carbon in Feed (default if coal refuse)</td>
+          <td><input type="number" id="fixedCarbonPct" value="35" step="1" /></td>
+          <td>wt% of feed</td>
+          <td>If Matrix = Coal Refuse, 35% is default.</td>
+        </tr>
+        <tr>
+          <td>GO</td>
+          <td>GO Conversion Yield (C → GO)</td>
+          <td><input type="number" id="goConversionPct" value="40" step="1" /></td>
+          <td>% of fixed C</td>
+          <td>Default 40% but overrideable.</td>
+        </tr>
+        <tr>
+          <td>GO</td>
+          <td>Portion of Fixed C sent to GO</td>
+          <td><input type="number" id="goSharePct" value="100" step="1" /></td>
+          <td>%</td>
+          <td>0–100%. Remainder assumed sold as coal fuel.</td>
+        </tr>
+        <tr>
+          <td>GO</td>
+          <td>GO Grade Selection</td>
+          <td>
+            <select id="goGrade">
+              <option value="low" selected>Low Grade – $150/kg</option>
+              <option value="mid">Mid Grade – $400/kg</option>
+              <option value="high">High Grade – $700/kg</option>
+            </select>
+          </td>
+          <td>–</td>
+          <td>Price band per Gemini ranges; editable price in Step 2.</td>
+        </tr>
+        <tr>
+          <td>Coal</td>
+          <td>Coal / Fuel Sales Price</td>
+          <td><input type="number" id="coalPricePerT" value="40" step="1" /></td>
+          <td>USD / t feed sold as coal</td>
+          <td>Only applied to portion of fixed C not upgraded to GO.</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>Step 1 Snapshot</h3>
+      <div class="summary-row">
+        <div class="summary-card">
+          <strong>Annual Feed</strong>
+          <span id="sum1Feed">0 mt/yr</span>
+        </div>
+        <div class="summary-card">
+          <strong>Global Recovery</strong>
+          <span id="sum1Rec">0 %</span>
+        </div>
+        <div class="summary-card">
+          <strong>Reserves (Feed)</strong>
+          <span id="sum1Reserves">0 mt</span>
+        </div>
+        <div class="summary-card">
+          <strong>GO Nameplate</strong>
+          <span id="sum1GO">0 t/yr</span>
+          <div class="small">Based on fixed C, GO yield, share.</div>
+        </div>
+      </div>
+
+      <h3>Scenario JSON (Save / Load)</h3>
+      <div class="note">
+        Use <b>Export Scenario JSON</b> / <b>Import Scenario JSON</b> buttons in the header to save and reload full scenarios.
+      </div>
+      <textarea id="scenarioJson" placeholder="Scenario JSON will appear here when exported, or paste here to import."></textarea>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="step2" class="step">
+      <h2>Step 2 – Element Mass Flow (Averages)</h2>
+      <div class="note">
+        This is the core mass flow engine: grade (ppm), recovery (%), product form, pricing unit &amp; value. 
+        Pre-filled with Fed No 2 averages for key elements plus GO.
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Group</th>
+          <th>Element</th>
+          <th>Symbol</th>
+          <th>Form</th>
+          <th class="text-center">Grade (ppm)</th>
+          <th class="text-center">Recovery (%)</th>
+          <th class="text-center">Factor<br>(t product / t metal)</th>
+          <th>Price Unit</th>
+          <th class="text-center">Price</th>
+          <th class="text-center">Metal (t/yr)</th>
+          <th class="text-center">Product (t/yr)</th>
+          <th class="text-center">Mass (kg/yr)</th>
+          <th class="text-center">Mass (oz/yr)</th>
+          <th class="text-center">Annual Revenue (USD)</th>
+        </tr>
+        </thead>
+        <tbody id="massFlowBody">
+        <!-- rows injected by JS -->
+        </tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="13">Total Metals Revenue (incl. GO &amp; Coal)</td>
+          <td class="text-center" id="mfTotalRevenue">0</td>
+        </tr>
+        <tr>
+          <td colspan="13" class="text-right small">Total annual product mass (all products)</td>
+          <td class="text-center" id="mfTotalMassKg">0 kg/yr</td>
+        </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="step3" class="step">
+      <h2>Step 3 – Valuation &amp; Reserves</h2>
+      <div class="note">
+        Any element with non-zero product appears here. Reserves use the same ppm &amp; recovery with the Reserves feed tonnage from Step 1.
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Element</th>
+          <th>Form</th>
+          <th class="text-center">Annual Product (t/yr)</th>
+          <th class="text-center">Annual Revenue (USD)</th>
+          <th class="text-center">Reserve Product (t)</th>
+          <th class="text-center">Reserves (oz)</th>
+          <th class="text-center">Reserve Value (USD)</th>
+        </tr>
+        </thead>
+        <tbody id="valuationBody">
+        <!-- rows injected by JS -->
+        </tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="3">Totals</td>
+          <td class="text-center" id="valTotalAnnualRev">0</td>
+          <td class="text-center" id="valTotalResT">0</td>
+          <td class="text-center" id="valTotalResOz">0</td>
+          <td class="text-center" id="valTotalResValue">0</td>
+        </tr>
+        </tfoot>
+      </table>
+
+      <h3>Summary</h3>
+      <div class="summary-row">
+        <div class="summary-card">
+          <strong>Total Annual Revenue</strong>
+          <span id="sum3AnnualRev">$0</span>
+        </div>
+        <div class="summary-card">
+          <strong>Total Reserve Value</strong>
+          <span id="sum3ReserveValue">$0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section id="step4" class="step">
+      <h2>Step 4 – Production Schedule (12-Month Ramp)</h2>
+      <div class="note">
+        Uses nameplate annual product from Step 2. Linear ramp from a starting % to 100% over N months.
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Parameter</th>
+          <th class="text-center">Value</th>
+          <th>Unit</th>
+          <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Ramp Months</td>
+          <td><input type="number" id="rampMonths" value="6" min="1" max="12" /></td>
+          <td>months</td>
+          <td>Linear ramp to 100% over N months.</td>
+        </tr>
+        <tr>
+          <td>Starting Production Rate</td>
+          <td><input type="number" id="rampStartPct" value="30" min="0" max="100" step="5" /></td>
+          <td>% of nameplate monthly</td>
+          <td>Month 1 factor; ramp interpolates to 100%.</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>Element Production by Month (t/month)</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Element</th>
+          <th>Form</th>
+          <th class="text-center">M1</th><th class="text-center">M2</th><th class="text-center">M3</th>
+          <th class="text-center">M4</th><th class="text-center">M5</th><th class="text-center">M6</th>
+          <th class="text-center">M7</th><th class="text-center">M8</th><th class="text-center">M9</th>
+          <th class="text-center">M10</th><th class="text-center">M11</th><th class="text-center">M12</th>
+          <th class="text-center">Scheduled (t/yr)</th>
+          <th class="text-center">Nameplate (t/yr)</th>
+          <th class="text-center">% of Nameplate</th>
+        </tr>
+        </thead>
+        <tbody id="scheduleBody"></tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="14">Totals</td>
+          <td class="text-center" id="schedTotalSched">0</td>
+          <td class="text-center" id="schedTotalName">0</td>
+          <td class="text-center" id="schedPct">0%</td>
+        </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- STEP 5 -->
+    <section id="step5" class="step">
+      <h2>Step 5 – CAPEX (CHIPS/TEA Baseline 1,000 tpd)</h2>
+      <div class="note">
+        Baseline direct CAPEX is referenced to a 1,000 tpd CHIPS plant. Costs are scaled by (capacity / 1000)<sup>0.6</sup> unless overridden.
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Parameter</th>
+          <th class="text-center">Value</th>
+          <th>Unit</th>
+          <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Reference Capacity</td>
+          <td class="text-right" id="capexRefCap">1000</td>
+          <td>mt/day</td>
+          <td>Baseline CHIPS plant.</td>
+        </tr>
+        <tr>
+          <td>Scale Exponent (default)</td>
+          <td><input type="number" id="capexScaleExp" value="0.6" step="0.05" /></td>
+          <td>–</td>
+          <td>Used for blocks without custom exponent.</td>
+        </tr>
+        <tr>
+          <td>Indirects &amp; Contingency</td>
+          <td><input type="number" id="capexIndirectPct" value="25" step="1" /></td>
+          <td>% of Direct CAPEX</td>
+          <td>EPCM, contingency, startup, etc.</td>
+        </tr>
+        <tr>
+          <td>Owner’s Costs</td>
+          <td><input type="number" id="capexOwnerPct" value="5" step="1" /></td>
+          <td>% of Direct CAPEX</td>
+          <td>Land, working capital, permitting, etc.</td>
+        </tr>
+        <tr>
+          <td>ITC / Tax Credit Rate</td>
+          <td><input type="number" id="capexItcPct" value="30" step="1" /></td>
+          <td>% of Total Project CAPEX</td>
+          <td>48C-style clean manufacturing credit.</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>Direct CAPEX by Process Block</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Block</th>
+          <th class="text-center">Base Cost @1,000 tpd (USD)</th>
+          <th class="text-center">Exponent</th>
+          <th class="text-center">Auto-Scaled Cost</th>
+          <th class="text-center">Override Cost</th>
+          <th class="text-center">Final Cost</th>
+        </tr>
+        </thead>
+        <tbody id="capexBody"><!-- rows via JS --></tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="5">Direct CAPEX</td>
+          <td class="text-center" id="capexDirect">0</td>
+        </tr>
+        <tr>
+          <td colspan="5">Indirects &amp; Contingency</td>
+          <td class="text-center" id="capexIndirect">0</td>
+        </tr>
+        <tr>
+          <td colspan="5">Owner’s Costs</td>
+          <td class="text-center" id="capexOwners">0</td>
+        </tr>
+        <tr>
+          <td colspan="5"><strong>Total Project CAPEX</strong></td>
+          <td class="text-center" id="capexTotal">0</td>
+        </tr>
+        <tr>
+          <td colspan="5">ITC / Tax Credit</td>
+          <td class="text-center" id="capexCredit">0</td>
+        </tr>
+        <tr>
+          <td colspan="5"><strong>Net CAPEX (after credit)</strong></td>
+          <td class="text-center" id="capexNet">0</td>
+        </tr>
+        <tr>
+          <td colspan="5" class="text-right small">CAPEX per annual feed tonne</td>
+          <td class="text-center" id="capexPerTFeed">0</td>
+        </tr>
+        <tr>
+          <td colspan="5" class="text-right small">CAPEX per annual product kg</td>
+          <td class="text-center" id="capexPerKgProd">0</td>
+        </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- STEP 6 -->
+    <section id="step6" class="step">
+      <h2>Step 6 – OPEX (Fixed &amp; Variable)</h2>
+      <div class="note">
+        OPEX is NOT calculated as a % of revenue. All values are explicit either as annual cost or as $/t feed, scaled by throughput.
+      </div>
+
+      <h3>6A – Fixed Operating Costs</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Category</th>
+          <th>Item</th>
+          <th class="text-center">Annual Cost (USD)</th>
+          <th class="text-center">Cost per t feed</th>
+          <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Labor</td>
+          <td>Operations Labor</td>
+          <td><input type="number" id="fxOperLabor" value="0" step="10000" /></td>
+          <td class="text-center" id="fxOperLaborPerT">0</td>
+          <td>Operators, control room, shift leads.</td>
+        </tr>
+        <tr>
+          <td>Labor</td>
+          <td>Maintenance Labor</td>
+          <td><input type="number" id="fxMaintLabor" value="0" step="10000" /></td>
+          <td class="text-center" id="fxMaintLaborPerT">0</td>
+          <td>Mechanical, electrical, I&amp;C techs.</td>
+        </tr>
+        <tr>
+          <td>Labor</td>
+          <td>G&amp;A / Support</td>
+          <td><input type="number" id="fxSupport" value="0" step="10000" /></td>
+          <td class="text-center" id="fxSupportPerT">0</td>
+          <td>Admin, lab, safety, etc.</td>
+        </tr>
+        <tr>
+          <td>Other</td>
+          <td>Property Tax &amp; Insurance</td>
+          <td><input type="number" id="fxTaxIns" value="0" step="10000" /></td>
+          <td class="text-center" id="fxTaxInsPerT">0</td>
+          <td>On plant &amp; equipment.</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="2">Total Fixed OPEX</td>
+          <td class="text-center" id="fxTotal">0</td>
+          <td class="text-center" id="fxTotalPerT">0</td>
+          <td></td>
+        </tr>
+        </tfoot>
+      </table>
+
+      <h3>6B – Variable &amp; Consumables</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Category</th>
+          <th>Item</th>
+          <th class="text-center">$ / t feed</th>
+          <th class="text-center">Annual Cost</th>
+          <th class="text-center">Notes</th>
+        </tr>
+        </thead>
+        <tbody id="varOpexBody"><!-- rows via JS --></tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="2">Total Variable OPEX</td>
+          <td class="text-center" id="varPerT">0</td>
+          <td class="text-center" id="varAnnual">0</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2">Total OPEX (Fixed + Variable)</td>
+          <td class="text-center" id="opxPerTTotal">0</td>
+          <td class="text-center" id="opxAnnualTotal">0</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="text-right small">OPEX per product kg</td>
+          <td class="text-center" id="opxPerKgProd" colspan="2">0</td>
+          <td></td>
+        </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- STEP 7 -->
+    <section id="step7" class="step">
+      <h2>Step 7 – Income Statement &amp; Financial Ratios</h2>
+      <div class="note">
+        Uses total annual metal + GO + coal revenue, OPEX, depreciation from CAPEX, tax rate, and COGS override (if used).
+      </div>
+
+      <h3>7A – Financial Inputs</h3>
+      <table>
+        <thead>
+        <tr><th>Parameter</th><th class="text-center">Value</th><th>Unit</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Tax Rate</td>
+          <td><input type="number" id="finTaxRate" value="21" step="0.5" /></td>
+          <td>% of EBIT</td>
+          <td>Federal + state effective.</td>
+        </tr>
+        <tr>
+          <td>COGS (processing etc.)</td>
+          <td><input type="number" id="finCogsPct" value="0" step="1" /></td>
+          <td>% of revenue (optional)</td>
+          <td>Leave 0 to avoid double-counting vs OPEX.</td>
+        </tr>
+        <tr>
+          <td>Royalty on Revenue (e.g., landowners)</td>
+          <td><input type="number" id="finRoyaltyRevPct" value="0" step="0.5" /></td>
+          <td>% of revenue</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Investor Net Profit Share</td>
+          <td><input type="number" id="finInvestorSharePct" value="0" step="1" /></td>
+          <td>% of Net Cash Flow</td>
+          <td>Used in Step 9 waterfall as profit share.</td>
+        </tr>
+        <tr>
+          <td>Depreciation Period</td>
+          <td><input type="number" id="finDepYears" value="10" step="1" /></td>
+          <td>years</td>
+          <td>Straight-line on total project CAPEX.</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>7B – Income Statement (Nameplate Year)</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Line Item</th>
+          <th class="text-center">Amount (USD)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>Revenue (metals + GO + coal)</td><td class="text-center" id="isRevenue">0</td></tr>
+        <tr><td>COGS (if used)</td><td class="text-center" id="isCogs">0</td></tr>
+        <tr><td>Gross Profit</td><td class="text-center" id="isGross">0</td></tr>
+        <tr><td>OPEX (from Step 6)</td><td class="text-center" id="isOpex">0</td></tr>
+        <tr><td>Royalties on Revenue</td><td class="text-center" id="isRoyaltyRev">0</td></tr>
+        <tr><td>EBITDA</td><td class="text-center" id="isEbitda">0</td></tr>
+        <tr><td>Depreciation</td><td class="text-center" id="isDep">0</td></tr>
+        <tr><td>EBIT</td><td class="text-center" id="isEbit">0</td></tr>
+        <tr><td>Taxes</td><td class="text-center" id="isTax">0</td></tr>
+        <tr><td><strong>Net Income</strong></td><td class="text-center" id="isNet">0</td></tr>
+        </tbody>
+      </table>
+
+      <h3>7C – Ratios &amp; Breakeven</h3>
+      <table>
+        <thead>
+        <tr><th>Metric</th><th class="text-center">Value</th><th>Formula</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>Profitability</td><td class="text-center" id="ratioProfit">0</td><td>Net Income / Revenue</td></tr>
+        <tr><td>Efficiency</td><td class="text-center" id="ratioEff">0</td><td>Revenue / Assets</td></tr>
+        <tr><td>Leverage</td><td class="text-center" id="ratioLev">0</td><td>Liabilities / Assets</td></tr>
+        <tr><td>ROA</td><td class="text-center" id="ratioROA">0</td><td>Net Income / Assets</td></tr>
+        <tr><td>ROE</td><td class="text-center" id="ratioROE">0</td><td>Net Income / Equity</td></tr>
+        <tr><td>Liquidity</td><td class="text-center" id="ratioLiq">0</td><td>Current Assets / Current Liabilities</td></tr>
+        <tr><td>Breakeven Revenue</td><td class="text-center" id="ratioBreakeven">0</td><td>OPEX + fixed costs + royalty / margin</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- STEP 8 -->
+    <section id="step8" class="step">
+      <h2>Step 8 – 10-Year Cash Flow</h2>
+      <div class="note">
+        Uses nameplate revenue/OPEX, net CAPEX, depreciation period, and discount rate. No debt assumed here (pure equity) – debt appears in Step 9.
+      </div>
+
+      <table>
+        <thead>
+        <tr><th>Parameter</th><th class="text-center">Value</th><th>Unit</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Project Life</td>
+          <td><input type="number" id="cfYears" value="10" step="1" /></td>
+          <td>years</td>
+          <td>Year 0 is CAPEX; Years 1–N are operations.</td>
+        </tr>
+        <tr>
+          <td>Discount Rate</td>
+          <td><input type="number" id="cfDiscRate" value="10" step="0.5" /></td>
+          <td>%</td>
+          <td>Used for NPV.</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>Cash Flow Table</h3>
+      <table>
+        <thead>
+        <tr>
+          <th class="text-center">Year</th>
+          <th class="text-center">Revenue</th>
+          <th class="text-center">OPEX</th>
+          <th class="text-center">COGS</th>
+          <th class="text-center">Royalty</th>
+          <th class="text-center">Depreciation</th>
+          <th class="text-center">EBIT</th>
+          <th class="text-center">Tax</th>
+          <th class="text-center">Net Income</th>
+          <th class="text-center">+ Dep</th>
+          <th class="text-center">CAPEX</th>
+          <th class="text-center">Net Cash Flow</th>
+          <th class="text-center">Disc. Factor</th>
+          <th class="text-center">Disc. Cash Flow</th>
+        </tr>
+        </thead>
+        <tbody id="cfBody"></tbody>
+        <tfoot>
+        <tr class="section-header">
+          <td colspan="11">NPV</td>
+          <td class="text-center" id="cfNpv">0</td>
+          <td colspan="2"></td>
+        </tr>
+        <tr>
+          <td colspan="11">IRR (approx.)</td>
+          <td class="text-center" id="cfIrr">0</td>
+          <td colspan="2"></td>
+        </tr>
+        <tr>
+          <td colspan="11">MOIC (Total Cash In / Net CAPEX)</td>
+          <td class="text-center" id="cfMoic">0</td>
+          <td colspan="2"></td>
+        </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- STEP 9 -->
+    <section id="step9" class="step">
+      <h2>Step 9 – Investor Inputs &amp; Waterfall Snapshot</h2>
+      <div class="note">
+        This is a simple investor view: equity amount, optional debt, and a net-profit share on project cash flows.
+      </div>
+
+      <h3>9A – Capital Structure</h3>
+      <table>
+        <thead>
+        <tr><th>Parameter</th><th class="text-center">Value</th><th>Unit</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Investor Equity</td>
+          <td><input type="number" id="invEquity" value="10000000" step="100000" /></td>
+          <td>USD</td>
+          <td>e.g., $10M pilot investment.</td>
+        </tr>
+        <tr>
+          <td>Debt Principal</td>
+          <td><input type="number" id="invDebt" value="0" step="100000" /></td>
+          <td>USD</td>
+          <td>Optional senior debt.</td>
+        </tr>
+        <tr>
+          <td>Debt Interest Rate</td>
+          <td><input type="number" id="invDebtRate" value="0" step="0.5" /></td>
+          <td>%/yr</td>
+          <td>Interest-only assumed for simplicity.</td>
+        </tr>
+        <tr>
+          <td>Investor Profit Share</td>
+          <td><input type="number" id="invSharePct" value="40" step="1" /></td>
+          <td>% of Net Cash Flow</td>
+          <td>Overlay on Step 7 Net Cash.</td>
+        </tr>
+        <tr>
+          <td>Target Payback Multiple</td>
+          <td><input type="number" id="invPaybackMult" value="2.5" step="0.1" /></td>
+          <td>x equity</td>
+          <td>For reference only here (no hard stop logic).</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>9B – Investor Distribution Summary (10-Year)</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>Metric</th>
+          <th class="text-center">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>Total Distributions to Equity</td><td class="text-center" id="invDistEquity">0</td></tr>
+        <tr><td>Total Interest to Debt</td><td class="text-center" id="invDistDebtInt">0</td></tr>
+        <tr><td>Equity MOIC (Investor)</td><td class="text-center" id="invEquityMoic">0</td></tr>
+        <tr><td>Equity IRR (Investor, approx.)</td><td class="text-center" id="invEquityIrr">0</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ========= UTILITIES ========= */
+function fmt(num, dec = 0) {
+  if (!isFinite(num)) return "0";
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: dec,
+    maximumFractionDigits: dec
+  });
+}
+function fmtCurr(num, dec = 0) {
+  if (!isFinite(num)) return "$0";
+  return num.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: dec,
+    maximumFractionDigits: dec
+  });
+}
+
+/* ========= STEP 0 – DBs ========= */
+
+// Element database: symbol → { name, defaultFormId, forms: [{id,label,factor,priceUnit,price}] }
+// NOTE: prices are rough placeholders and can be overridden in UI.
+const elementDB = {
+  // Precious metals
+  Au: {name:"Gold", defaultFormId:"Au_metal", forms:[
+    {id:"Au_metal", label:"Gold Metal (Au)", factor:1.0, priceUnit:"oz", price:2300}
+  ]},
+  Ag: {name:"Silver", defaultFormId:"Ag_metal", forms:[
+    {id:"Ag_metal", label:"Silver Metal (Ag)", factor:1.0, priceUnit:"oz", price:28}
+  ]},
+  Pt: {name:"Platinum", defaultFormId:"Pt_metal", forms:[
+    {id:"Pt_metal", label:"Platinum Metal (Pt)", factor:1.0, priceUnit:"oz", price:1000}
+  ]},
+  Pd: {name:"Palladium", defaultFormId:"Pd_metal", forms:[
+    {id:"Pd_metal", label:"Palladium Metal (Pd)", factor:1.0, priceUnit:"oz", price:900}
+  ]},
+  Rh: {name:"Rhodium", defaultFormId:"Rh_metal", forms:[
+    {id:"Rh_metal", label:"Rhodium Metal (Rh)", factor:1.0, priceUnit:"oz", price:4500}
+  ]},
+  Ru: {name:"Ruthenium", defaultFormId:"Ru_metal", forms:[
+    {id:"Ru_metal", label:"Ruthenium Metal (Ru)", factor:1.0, priceUnit:"oz", price:500}
+  ]},
+  Ir: {name:"Iridium", defaultFormId:"Ir_metal", forms:[
+    {id:"Ir_metal", label:"Iridium Metal (Ir)", factor:1.0, priceUnit:"oz", price:4500}
+  ]},
+  Os: {name:"Osmium", defaultFormId:"Os_metal", forms:[
+    {id:"Os_metal", label:"Osmium Metal (Os)", factor:1.0, priceUnit:"oz", price:400}
+  ]},
+
+  // LREE
+  La:{name:"Lanthanum",defaultFormId:"La2O3",forms:[{id:"La2O3",label:"Lanthanum Oxide (La₂O₃)",factor:1.17,priceUnit:"mt",price:7000}]},
+  Ce:{name:"Cerium",defaultFormId:"CeO2",forms:[{id:"CeO2",label:"Cerium Oxide (CeO₂)",factor:1.18,priceUnit:"mt",price:6000}]},
+  Pr:{name:"Praseodymium",defaultFormId:"Pr6O11",forms:[{id:"Pr6O11",label:"Praseodymium Oxide (Pr₆O₁₁)",factor:1.17,priceUnit:"mt",price:55000}]},
+  Nd:{name:"Neodymium",defaultFormId:"Nd2O3",forms:[{id:"Nd2O3",label:"Neodymium Oxide (Nd₂O₃)",factor:1.17,priceUnit:"mt",price:60000}]},
+  Sm:{name:"Samarium",defaultFormId:"Sm2O3",forms:[{id:"Sm2O3",label:"Samarium Oxide (Sm₂O₃)",factor:1.17,priceUnit:"mt",price:28000}]},
+  Eu:{name:"Europium",defaultFormId:"Eu2O3",forms:[{id:"Eu2O3",label:"Europium Oxide (Eu₂O₃)",factor:1.17,priceUnit:"mt",price:240000}]},
+  Gd:{name:"Gadolinium",defaultFormId:"Gd2O3",forms:[{id:"Gd2O3",label:"Gadolinium Oxide (Gd₂O₃)",factor:1.17,priceUnit:"mt",price:26000}]},
+
+  // HREE
+  Tb:{name:"Terbium",defaultFormId:"Tb4O7",forms:[{id:"Tb4O7",label:"Terbium Oxide (Tb₄O₇)",factor:1.18,priceUnit:"mt",price:800000}]},
+  Dy:{name:"Dysprosium",defaultFormId:"Dy2O3",forms:[{id:"Dy2O3",label:"Dysprosium Oxide (Dy₂O₃)",factor:1.17,priceUnit:"mt",price:390000}]},
+  Ho:{name:"Holmium",defaultFormId:"Ho2O3",forms:[{id:"Ho2O3",label:"Holmium Oxide (Ho₂O₃)",factor:1.17,priceUnit:"mt",price:140000}]},
+  Er:{name:"Erbium",defaultFormId:"Er2O3",forms:[{id:"Er2O3",label:"Erbium Oxide (Er₂O₃)",factor:1.17,priceUnit:"mt",price:75000}]},
+  Tm:{name:"Thulium",defaultFormId:"Tm2O3",forms:[{id:"Tm2O3",label:"Thulium Oxide (Tm₂O₃)",factor:1.17,priceUnit:"mt",price:180000}]},
+  Yb:{name:"Ytterbium",defaultFormId:"Yb2O3",forms:[{id:"Yb2O3",label:"Ytterbium Oxide (Yb₂O₃)",factor:1.17,priceUnit:"mt",price:38000}]},
+  Lu:{name:"Lutetium",defaultFormId:"Lu2O3",forms:[{id:"Lu2O3",label:"Lutetium Oxide (Lu₂O₃)",factor:1.17,priceUnit:"mt",price:620000}]},
+
+  // Y, Sc, Li
+  Y:{name:"Yttrium",defaultFormId:"Y_metal",forms:[
+    {id:"Y_metal",label:"Yttrium Metal 5N",factor:1.0,priceUnit:"kg",price:850},
+    {id:"Y2O3",label:"Yttrium Oxide (Y₂O₃)",factor:1.27,priceUnit:"mt",price:20000}
+  ]},
+  Sc:{name:"Scandium",defaultFormId:"Sc_metal",forms:[
+    {id:"Sc_metal",label:"Scandium Metal 5N",factor:1.0,priceUnit:"kg",price:4500},
+    {id:"Sc2O3",label:"Scandium Oxide (Sc₂O₃)",factor:1.5,priceUnit:"kg",price:3300}
+  ]},
+  Li:{name:"Lithium",defaultFormId:"Li2CO3",forms:[
+    {id:"Li2CO3",label:"Lithium Carbonate (Li₂CO₃)",factor:5.32,priceUnit:"mt",price:15000},
+    {id:"LiOH",label:"Lithium Hydroxide (LiOH·H₂O)",factor:6.29,priceUnit:"mt",price:17000}
+  ]},
+
+  // Others requested
+  Ga:{name:"Gallium",defaultFormId:"Ga2O3",forms:[
+    {id:"Ga2O3",label:"Gallium Oxide (Ga₂O₃)",factor:1.32,priceUnit:"kg",price:500}
+  ]},
+  Ge:{name:"Germanium",defaultFormId:"GeO2",forms:[
+    {id:"GeO2",label:"Germanium Dioxide (GeO₂)",factor:1.44,priceUnit:"kg",price:1200}
+  ]},
+  Zr:{name:"Zirconium",defaultFormId:"ZrO2",forms:[
+    {id:"ZrO2",label:"Zirconia (ZrO₂)",factor:1.35,priceUnit:"mt",price:2500}
+  ]},
+  Sr:{name:"Strontium",defaultFormId:"SrCO3",forms:[
+    {id:"SrCO3",label:"Strontium Carbonate (SrCO₃)",factor:1.7,priceUnit:"mt",price:3000}
+  ]},
+  V:{name:"Vanadium",defaultFormId:"V2O5",forms:[
+    {id:"V2O5",label:"Vanadium Pentoxide (V₂O₅)",factor:1.8,priceUnit:"mt",price:28000}
+  ]},
+  U:{name:"Uranium",defaultFormId:"U3O8",forms:[
+    {id:"U3O8",label:"U₃O₈ (yellowcake)",factor:1.18,priceUnit:"kg",price:190}
+  ]},
+  Th:{name:"Thorium",defaultFormId:"ThO2",forms:[
+    {id:"ThO2",label:"Thorium Oxide (ThO₂)",factor:1.17,priceUnit:"mt",price:3000}
+  ]},
+
+  // Base metals for completeness
+  Cu:{name:"Copper",defaultFormId:"Cu_cath",forms:[
+    {id:"Cu_cath",label:"Copper Cathode",factor:1.0,priceUnit:"mt",price:9000}
+  ]},
+  Ni:{name:"Nickel",defaultFormId:"Ni_metal",forms:[
+    {id:"Ni_metal",label:"Nickel Metal",factor:1.0,priceUnit:"mt",price:18000}
+  ]},
+  Zn:{name:"Zinc",defaultFormId:"Zn_metal",forms:[
+    {id:"Zn_metal",label:"Zinc Metal",factor:1.0,priceUnit:"mt",price:2700}
+  ]},
+  Co:{name:"Cobalt",defaultFormId:"Co_metal",forms:[
+    {id:"Co_metal",label:"Cobalt Metal",factor:1.0,priceUnit:"mt",price:33000}
+  ]},
+  Mn:{name:"Manganese",defaultFormId:"MnSO4",forms:[
+    {id:"MnSO4",label:"Manganese Sulfate",factor:1.3,priceUnit:"mt",price:2000}
+  ]},
+  Fe:{name:"Iron",defaultFormId:"Fe_conc",forms:[
+    {id:"Fe_conc",label:"Iron Concentrate",factor:1.0,priceUnit:"mt",price:120}
+  ]},
+  Al:{name:"Aluminum",defaultFormId:"Al_metal",forms:[
+    {id:"Al_metal",label:"Aluminum Metal",factor:1.0,priceUnit:"mt",price:2500}
+  ]},
+  Ti:{name:"Titanium",defaultFormId:"TiO2",forms:[
+    {id:"TiO2",label:"Titanium Dioxide (TiO₂)",factor:1.66,priceUnit:"mt",price:3000}
+  ]},
+  Si:{name:"Silicon",defaultFormId:"SiO2",forms:[
+    {id:"SiO2",label:"Silica (SiO₂)",factor:2.14,priceUnit:"mt",price:50}
+  ]},
+  Ca:{name:"Calcium",defaultFormId:"CaCO3",forms:[
+    {id:"CaCO3",label:"Calcium Carbonate (CaCO₃)",factor:2.5,priceUnit:"mt",price:40}
+  ]},
+  Mg:{name:"Magnesium",defaultFormId:"MgO",forms:[
+    {id:"MgO",label:"Magnesia (MgO)",factor:1.66,priceUnit:"mt",price:300}
+  ]},
+
+  // Graphene Oxide (special – not ppm based)
+  C_GO:{name:"Graphene Oxide",defaultFormId:"GO_powder",forms:[
+    {id:"GO_powder",label:"Graphene Oxide Powder",factor:1.0,priceUnit:"kg",price:700}
+  ]}
+};
+
+// Fed No 2 sample averages (ppm) – from your sheet (approx, fill key ones).
+const fedNo2AvgPpm = {
+  // TREY + Sc + others (approx; adjust as needed)
+  Sc:44.12,
+  Y:35.39,
+  La:49.41,
+  Ce:105.78,
+  Pr:13.78,
+  Nd:48.32,
+  Sm:11.77,
+  Eu:2.73,
+  Gd:9.33,
+  Tb:1.40,
+  Dy:8.53,
+  Ho:1.83,
+  Er:6.72,
+  Tm:0.68,
+  Yb:3.46,
+  Lu:0.72,
+
+  // Lithium, etc. (approx placeholders)
+  Li:77.12,
+  Ga:26.0,
+  Zr:157.0,
+  V:100.0,
+  Co:5.0,
+  Sr:183.0,
+  Ni:27.0,
+  Zn:85.0,
+  Cu:50.0
+};
+
+/* CAPEX baseline blocks for 1000 tpd */
+const capexBlocks = [
+  {id:"feed_pulsewave", label:"Feed Handling & PulseWave Liberation", base:8000000, exp:0.6},
+  {id:"chips_leach", label:"CHIPS Leach & Precipitation", base:12000000, exp:0.6},
+  {id:"pec", label:"PEC (Plasma Electrocoagulation)", base:6000000, exp:0.6},
+  {id:"solid_liquid", label:"Solid–Liquid Separation", base:5000000, exp:0.6},
+  {id:"ix_sx", label:"IX / SX & Polishing", base:8000000, exp:0.6},
+  {id:"product_handling", label:"Drying & Product Handling", base:4000000, exp:0.6},
+  {id:"utilities_bop", label:"Utilities & Balance of Plant", base:9000000, exp:0.7}
+];
+
+/* Variable OPEX rows ($/t feed) */
+const varOpexRows = [
+  {id:"vx_power", category:"Utilities", label:"Electric Power"},
+  {id:"vx_water", category:"Utilities", label:"Water & Wastewater"},
+  {id:"vx_chips", category:"Reagents", label:"CHIPS Reagents"},
+  {id:"vx_pec", category:"Reagents", label:"PEC Consumables"},
+  {id:"vx_ixsx", category:"Reagents", label:"IX/SX Solvents"},
+  {id:"vx_waste", category:"Waste", label:"Waste Disposal"},
+  {id:"vx_other", category:"Other", label:"Other Variable OPEX"}
+];
+
+/* ========= BUILD UI ========= */
+
+// Build Step 2 rows
+function buildMassFlowTable() {
+  const tbody = document.getElementById("massFlowBody");
+  tbody.innerHTML = "";
+  const groups = [];
+
+  // Build list of symbols we care about: all DB plus GO at end
+  const symbols = Object.keys(elementDB)
+    .filter(s => s !== "C_GO")
+    .sort();
+  symbols.push("C_GO");
+
+  symbols.forEach(sym => {
+    const meta = elementDB[sym];
+    if (!meta) return;
+    const group =
+      ["Au","Ag","Pt","Pd","Rh","Ru","Ir","Os"].includes(sym) ? "Precious / PGMs" :
+      ["La","Ce","Pr","Nd","Sm","Eu","Gd"].includes(sym) ? "LREE" :
+      ["Tb","Dy","Ho","Er","Tm","Yb","Lu"].includes(sym) ? "HREE" :
+      ["Y","Sc","Li"].includes(sym) ? "Critical Y/Sc/Li" :
+      ["Ga","Ge","Zr","Sr","V","U","Th"].includes(sym) ? "Other Critical" :
+      sym==="C_GO" ? "Graphene Oxide / Coal" :
+      "Base Metals / Gangue";
+
+    const row = document.createElement("tr");
+    row.dataset.symbol = sym;
+
+    const formOptions = meta.forms.map(f => `<option value="${f.id}">${f.label}</option>`).join("");
+    const defaultForm = meta.forms.find(f => f.id === meta.defaultFormId) || meta.forms[0];
+    const basePpm = fedNo2AvgPpm[sym] || 0;
+
+    let priceUnit = defaultForm.priceUnit;
+    let priceVal = defaultForm.price;
+
+    // GO price seeded from grade choice later – initial: 700/kg
+    if (sym === "C_GO") {
+      priceUnit = "kg";
+      priceVal = 700;
+    }
+
+    row.innerHTML = `
+      <td>${group}</td>
+      <td>${meta.name}</td>
+      <td>${sym}</td>
+      <td>
+        <select class="mf-form">
+          ${formOptions}
+        </select>
+      </td>
+      <td><input type="number" class="mf-ppm" value="${basePpm}" step="0.01" /></td>
+      <td><input type="number" class="mf-rec" value="${sym==="C_GO" ? "" : 95}" step="0.1" /></td>
+      <td><input type="number" class="mf-factor" value="${defaultForm.factor}" step="0.01" /></td>
+      <td>
+        <select class="mf-price-unit">
+          <option value="mt" ${priceUnit==="mt"?"selected":""}>USD / t</option>
+          <option value="kg" ${priceUnit==="kg"?"selected":""}>USD / kg</option>
+          <option value="g" ${priceUnit==="g"?"selected":""}>USD / g</option>
+          <option value="oz" ${priceUnit==="oz"?"selected":""}>USD / oz</option>
+        </select>
+      </td>
+      <td><input type="number" class="mf-price" value="${priceVal}" step="0.01" /></td>
+      <td class="text-center mf-metal-ty">0</td>
+      <td class="text-center mf-prod-ty">0</td>
+      <td class="text-center mf-mass-kg">0</td>
+      <td class="text-center mf-mass-oz">0</td>
+      <td class="text-center mf-revenue">0</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Build CAPEX rows
+function buildCapexTable() {
+  const tbody = document.getElementById("capexBody");
+  tbody.innerHTML = "";
+  capexBlocks.forEach(b => {
+    const tr = document.createElement("tr");
+    tr.dataset.blockId = b.id;
+    tr.innerHTML = `
+      <td>${b.label}</td>
+      <td><input type="number" class="cap-base" value="${b.base}" step="100000" /></td>
+      <td><input type="number" class="cap-exp" value="${b.exp}" step="0.05" /></td>
+      <td class="text-center cap-auto">0</td>
+      <td><input type="number" class="cap-override" value="0" step="100000" /></td>
+      <td class="text-center cap-final">0</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Build variable OPEX rows
+function buildVarOpexTable() {
+  const tbody = document.getElementById("varOpexBody");
+  tbody.innerHTML = "";
+  varOpexRows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.dataset.opexId = r.id;
+    tr.innerHTML = `
+      <td>${r.category}</td>
+      <td>${r.label}</td>
+      <td><input type="number" class="vx-perT" value="0" step="0.1" /></td>
+      <td class="text-center vx-annual">0</td>
+      <td></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ========= CORE CALC ========= */
+
+let cachedMassResults = []; // used by steps 3,4,7,8
+
+function getFeedParams() {
+  const feedMtpd = parseFloat(document.getElementById("feedMtpd").value) || 0;
+  const hours = parseFloat(document.getElementById("hoursPerDay").value) || 0;
+  const days = parseFloat(document.getElementById("daysPerYear").value) || 0;
+  const mtph = hours>0 ? feedMtpd / hours : 0;
+  const mtpy = feedMtpd * days;
+
+  const globalRec = parseFloat(document.getElementById("globalRecoveryPct").value) || 0;
+  const reservesMt = parseFloat(document.getElementById("reservesMt").value) || 0;
+
+  const fixedC = parseFloat(document.getElementById("fixedCarbonPct").value) || 0;
+  const goConv = parseFloat(document.getElementById("goConversionPct").value) || 0;
+  const goShare = parseFloat(document.getElementById("goSharePct").value) || 0;
+  const coalPricePerT = parseFloat(document.getElementById("coalPricePerT").value) || 0;
+
+  // GO grade default pricing band
+  const goGrade = document.getElementById("goGrade").value;
+  let goPriceDefault = 150;
+  if (goGrade === "mid") goPriceDefault = 400;
+  if (goGrade === "high") goPriceDefault = 700;
+
+  return {
+    feedMtpd, hours, days, mtph, mtpy,
+    globalRec, reservesMt,
+    fixedC, goConv, goShare,
+    coalPricePerT,
+    goPriceDefault
+  };
+}
+
+function recalcStep1() {
+  const p = getFeedParams();
+  document.getElementById("outFeedMtph").textContent = fmt(p.mtph,2);
+  document.getElementById("outFeedMtpy").textContent = fmt(p.mtpy,0);
+  document.getElementById("sum1Feed").textContent = fmt(p.mtpy,0) + " mt/yr";
+  document.getElementById("sum1Rec").textContent = fmt(p.globalRec,1) + " %";
+  document.getElementById("sum1Reserves").textContent = fmt(p.reservesMt,0) + " mt";
+
+  // GO nameplate tonnage (t/yr product)
+  const goT = p.mtpy * (p.fixedC/100) * (p.goConv/100) * (p.goShare/100);
+  document.getElementById("sum1GO").textContent = fmt(goT,2) + " t/yr";
+  return p;
+}
+
+function recalcMassFlow(p) {
+  const tbody = document.getElementById("massFlowBody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const mtpy = p.mtpy;
+  const globalRec = p.globalRec;
+  const reservesMt = p.reservesMt;
+
+  let totalRev = 0;
+  let totalMassKg = 0;
+  let valRows = [];
+  let coalRevenue = 0;
+
+  rows.forEach(tr => {
+    const sym = tr.dataset.symbol;
+    const meta = elementDB[sym];
+    const formSel = tr.querySelector(".mf-form");
+    const ppmInput = tr.querySelector(".mf-ppm");
+    const recInput = tr.querySelector(".mf-rec");
+    const factorInput = tr.querySelector(".mf-factor");
+    const priceUnitSel = tr.querySelector(".mf-price-unit");
+    const priceInput = tr.querySelector(".mf-price");
+
+    let ppm = parseFloat(ppmInput.value) || 0;
+    let rec = recInput.value === "" ? globalRec : (parseFloat(recInput.value) || 0);
+    let factor = parseFloat(factorInput.value) || 1;
+    let priceUnit = priceUnitSel.value;
+    let price = parseFloat(priceInput.value) || 0;
+
+    let metalT = 0, prodT = 0, kg = 0, oz = 0, revenue = 0;
+
+    if (sym === "C_GO") {
+      // GO ignores ppm; uses fixed C engine.
+      const mtpyFeed = mtpy;
+      const fixedMass = mtpyFeed * (p.fixedC/100); // t fixed C/yr
+      const tToGO = fixedMass * (p.goConv/100) * (p.goShare/100); // t GO
+      metalT = tToGO;          // treat as "metal"
+      prodT = tToGO;           // 1:1 factor
+      kg = tToGO * 1000;
+      oz = kg * 1000 / 31.1035;
+      // price override from grade selection if price still default 0/700
+      if (!price || price <= 0) price = p.goPriceDefault;
+      // majority of GO trades per kg
+      if (priceUnit === "mt") revenue = prodT * price;
+      else if (priceUnit === "kg") revenue = kg * price;
+      else if (priceUnit === "g") revenue = kg*1000*price;
+      else if (priceUnit === "oz") revenue = oz*price;
+
+      // coal side: portion of fixed C NOT upgraded
+      const coalShare = 1 - (p.goShare/100);
+      if (coalShare > 0 && p.coalPricePerT > 0) {
+        const coalT = mtpyFeed * coalShare; // simple – t feed sold as coal
+        coalRevenue = coalT * p.coalPricePerT;
+      }
+    } else {
+      if (ppm > 0 && rec > 0 && mtpy > 0) {
+        metalT = mtpy * (ppm/1e6) * (rec/100);
+        prodT = metalT * factor;
+        kg = prodT * 1000;
+        oz = kg * 1000 / 31.1035;
+
+        if (priceUnit === "mt") revenue = prodT * price;
+        else if (priceUnit === "kg") revenue = kg * price;
+        else if (priceUnit === "g") revenue = kg*1000*price;
+        else if (priceUnit === "oz") revenue = oz*price;
+      }
+    }
+
+    totalRev += revenue;
+    totalMassKg += kg;
+
+    tr.querySelector(".mf-metal-ty").textContent = fmt(metalT,4);
+    tr.querySelector(".mf-prod-ty").textContent = fmt(prodT,4);
+    tr.querySelector(".mf-mass-kg").textContent = fmt(kg,0);
+    tr.querySelector(".mf-mass-oz").textContent = fmt(oz,0);
+    tr.querySelector(".mf-revenue").textContent = fmt(revenue,0);
+
+    // reserves
+    let resProdT = 0, resOz = 0, resVal = 0;
+    if (reservesMt > 0 && sym !== "C_GO") {
+      const resMetalT = reservesMt * (ppm/1e6) * (rec/100);
+      resProdT = resMetalT * factor;
+      const resKg = resProdT * 1000;
+      resOz = resKg * 1000 / 31.1035;
+      if (priceUnit === "mt") resVal = resProdT * price;
+      else if (priceUnit === "kg") resVal = resKg * price;
+      else if (priceUnit === "g") resVal = resKg*1000*price;
+      else if (priceUnit === "oz") resVal = resOz*price;
+    }
+
+    if (prodT > 0 || resProdT > 0) {
+      const formLabel = formSel.options[formSel.selectedIndex]?.textContent || "";
+      valRows.push({
+        element: meta.name,
+        form: formLabel,
+        prodT, revenue,
+        resProdT, resOz, resVal
+      });
+    }
+  });
+
+  totalRev += coalRevenue;
+  document.getElementById("mfTotalRevenue").textContent = fmt(totalRev,0);
+  document.getElementById("mfTotalMassKg").textContent = fmt(totalMassKg,0) + " kg/yr";
+
+  cachedMassResults = valRows;
+  document.getElementById("sum3AnnualRev").textContent = fmtCurr(totalRev);
+  return {totalRev, totalMassKg, coalRevenue};
+}
+
+function recalcValuation(res, p) {
+  const tbody = document.getElementById("valuationBody");
+  tbody.innerHTML = "";
+  let totAnnualRev = 0, totResT = 0, totResOz = 0, totResVal = 0;
+
+  res.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.element}</td>
+      <td>${r.form}</td>
+      <td class="text-center">${fmt(r.prodT,4)}</td>
+      <td class="text-center">${fmt(r.revenue,0)}</td>
+      <td class="text-center">${fmt(r.resProdT,4)}</td>
+      <td class="text-center">${fmt(r.resOz,0)}</td>
+      <td class="text-center">${fmt(r.resVal,0)}</td>
+    `;
+    tbody.appendChild(tr);
+    totAnnualRev += r.revenue;
+    totResT += r.resProdT;
+    totResOz += r.resOz;
+    totResVal += r.resVal;
+  });
+
+  document.getElementById("valTotalAnnualRev").textContent = fmt(totAnnualRev,0);
+  document.getElementById("valTotalResT").textContent = fmt(totResT,4);
+  document.getElementById("valTotalResOz").textContent = fmt(totResOz,0);
+  document.getElementById("valTotalResValue").textContent = fmt(totResVal,0);
+  document.getElementById("sum3ReserveValue").textContent = fmtCurr(totResVal);
+}
+
+function recalcSchedule(res) {
+  const rampMonths = parseInt(document.getElementById("rampMonths").value) || 1;
+  const startPct = parseFloat(document.getElementById("rampStartPct").value) || 0;
+  const tbody = document.getElementById("scheduleBody");
+  tbody.innerHTML = "";
+
+  let totalName = 0, totalSched = 0;
+
+  res.forEach(r => {
+    if (r.prodT <= 0) return;
+    const monthlyName = r.prodT / 12;
+    const months = [];
+    let sched = 0;
+    for (let m=1;m<=12;m++) {
+      let f;
+      if (m===1) f = startPct/100;
+      else if (m <= rampMonths) {
+        const t0 = startPct/100;
+        const t1 = 1;
+        const frac = (m-1)/(rampMonths-1 || 1);
+        f = t0 + (t1-t0)*frac;
+      } else {
+        f = 1;
+      }
+      const mt = monthlyName * f;
+      months.push(mt);
+      sched += mt;
+    }
+    totalName += r.prodT;
+    totalSched += sched;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.element}</td>
+      <td>${r.form}</td>
+      ${months.map(v=>`<td class="text-center">${fmt(v,3)}</td>`).join("")}
+      <td class="text-center">${fmt(sched,4)}</td>
+      <td class="text-center">${fmt(r.prodT,4)}</td>
+      <td class="text-center">${fmt(100*sched/(r.prodT||1),1)}%</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("schedTotalSched").textContent = fmt(totalSched,4);
+  document.getElementById("schedTotalName").textContent = fmt(totalName,4);
+  document.getElementById("schedPct").textContent = totalName>0 ? fmt(100*totalSched/totalName,1)+"%" : "0%";
+  return {totalName, totalSched};
+}
+
+function recalcCapex(p, totalMassKg) {
+  const refCap = 1000;
+  const expDefault = parseFloat(document.getElementById("capexScaleExp").value) || 0.6;
+  const feed = p.feedMtpd;
+
+  let direct = 0;
+
+  document.getElementById("capexRefCap").textContent = refCap;
+
+  document.querySelectorAll("#capexBody tr").forEach(tr=>{
+    const baseInput = tr.querySelector(".cap-base");
+    const expInput = tr.querySelector(".cap-exp");
+    const autoCell = tr.querySelector(".cap-auto");
+    const overrideInput = tr.querySelector(".cap-override");
+    const finalCell = tr.querySelector(".cap-final");
+
+    const base = parseFloat(baseInput.value) || 0;
+    const exp = parseFloat(expInput.value) || expDefault;
+    const override = parseFloat(overrideInput.value) || 0;
+
+    const ratio = feed>0 ? feed/refCap : 0;
+    const auto = base * (ratio>0 ? Math.pow(ratio,exp) : 0);
+    const finalCost = override>0 ? override : auto;
+
+    autoCell.textContent = fmt(auto,0);
+    finalCell.textContent = fmt(finalCost,0);
+    direct += finalCost;
+  });
+
+  const indPct = parseFloat(document.getElementById("capexIndirectPct").value) || 0;
+  const ownerPct = parseFloat(document.getElementById("capexOwnerPct").value) || 0;
+  const itcPct = parseFloat(document.getElementById("capexItcPct").value) || 0;
+
+  const indirect = direct * indPct/100;
+  const owners = direct * ownerPct/100;
+  const total = direct + indirect + owners;
+  const credit = total * itcPct/100;
+  const net = total - credit;
+
+  document.getElementById("capexDirect").textContent = fmt(direct,0);
+  document.getElementById("capexIndirect").textContent = fmt(indirect,0);
+  document.getElementById("capexOwners").textContent = fmt(owners,0);
+  document.getElementById("capexTotal").textContent = fmt(total,0);
+  document.getElementById("capexCredit").textContent = fmt(credit,0);
+  document.getElementById("capexNet").textContent = fmt(net,0);
+
+  const capexPerTFeed = p.mtpy>0 ? net / p.mtpy : 0;
+  const capexPerKgProd = totalMassKg>0 ? net / totalMassKg : 0;
+  document.getElementById("capexPerTFeed").textContent = fmt(capexPerTFeed,0);
+  document.getElementById("capexPerKgProd").textContent = fmt(capexPerKgProd,2);
+
+  return {direct,total,net};
+}
+
+function recalcOpex(p, totalMassKg) {
+  const mtpy = p.mtpy;
+
+  const fxOper = parseFloat(document.getElementById("fxOperLabor").value)||0;
+  const fxMaint = parseFloat(document.getElementById("fxMaintLabor").value)||0;
+  const fxSupport = parseFloat(document.getElementById("fxSupport").value)||0;
+  const fxTaxIns = parseFloat(document.getElementById("fxTaxIns").value)||0;
+  const fxTotal = fxOper+fxMaint+fxSupport+fxTaxIns;
+
+  function perT(v){return mtpy>0 ? v/mtpy : 0;}
+  document.getElementById("fxOperLaborPerT").textContent = fmt(perT(fxOper),2);
+  document.getElementById("fxMaintLaborPerT").textContent = fmt(perT(fxMaint),2);
+  document.getElementById("fxSupportPerT").textContent = fmt(perT(fxSupport),2);
+  document.getElementById("fxTaxInsPerT").textContent = fmt(perT(fxTaxIns),2);
+  document.getElementById("fxTotal").textContent = fmt(fxTotal,0);
+  document.getElementById("fxTotalPerT").textContent = fmt(perT(fxTotal),2);
+
+  // variable
+  let varPerT = 0;
+  document.querySelectorAll("#varOpexBody tr").forEach(tr=>{
+    const input = tr.querySelector(".vx-perT");
+    const per = parseFloat(input.value)||0;
+    const annual = per * mtpy;
+    tr.querySelector(".vx-annual").textContent = fmt(annual,0);
+    varPerT += per;
+  });
+  const varAnnual = varPerT * mtpy;
+
+  document.getElementById("varPerT").textContent = fmt(varPerT,2);
+  document.getElementById("varAnnual").textContent = fmt(varAnnual,0);
+
+  const totalAnnual = fxTotal + varAnnual;
+  const totalPerT = perT(totalAnnual);
+  const perKgProd = totalMassKg>0 ? totalAnnual/totalMassKg : 0;
+
+  document.getElementById("opxAnnualTotal").textContent = fmt(totalAnnual,0);
+  document.getElementById("opxPerTTotal").textContent = fmt(totalPerT,2);
+  document.getElementById("opxPerKgProd").textContent = fmt(perKgProd,4);
+
+  return {annual:totalAnnual, perT:totalPerT};
+}
+
+function recalcIncome(totalRev, opexAnnual, capexTotals, p) {
+  const taxRate = (parseFloat(document.getElementById("finTaxRate").value)||0)/100;
+  const cogsPct = (parseFloat(document.getElementById("finCogsPct").value)||0)/100;
+  const royRevPct = (parseFloat(document.getElementById("finRoyaltyRevPct").value)||0)/100;
+  const depYears = parseFloat(document.getElementById("finDepYears").value)||10;
+
+  const cogs = totalRev * cogsPct;
+  const gross = totalRev - cogs;
+  const royalty = totalRev * royRevPct;
+  const dep = depYears>0 ? capexTotals.total/depYears : 0;
+  const ebitda = gross - opexAnnual - royalty;
+  const ebit = ebitda - dep;
+  const tax = ebit>0 ? ebit*taxRate : 0;
+  const net = ebit - tax;
+
+  document.getElementById("isRevenue").textContent = fmt(totalRev,0);
+  document.getElementById("isCogs").textContent = fmt(cogs,0);
+  document.getElementById("isGross").textContent = fmt(gross,0);
+  document.getElementById("isOpex").textContent = fmt(opexAnnual,0);
+  document.getElementById("isRoyaltyRev").textContent = fmt(royalty,0);
+  document.getElementById("isEbitda").textContent = fmt(ebitda,0);
+  document.getElementById("isDep").textContent = fmt(dep,0);
+  document.getElementById("isEbit").textContent = fmt(ebit,0);
+  document.getElementById("isTax").textContent = fmt(tax,0);
+  document.getElementById("isNet").textContent = fmt(net,0);
+
+  // Ratios
+  const assets = capexTotals.net; // simple: use net CAPEX as asset base
+  const liabilities = parseFloat(document.getElementById("invDebt").value)||0;
+  const equity = assets - liabilities;
+  const currentAssets = assets*0.1;
+  const currentLiab = liabilities*0.2 || assets*0.05;
+
+  const profitability = totalRev>0 ? net/totalRev : 0;
+  const eff = assets>0 ? totalRev/assets : 0;
+  const lev = assets>0 ? liabilities/assets : 0;
+  const roa = assets>0 ? net/assets : 0;
+  const roe = equity>0 ? net/equity : 0;
+  const liq = currentLiab>0 ? currentAssets/currentLiab : 0;
+
+  // Breakeven revenue using gross margin approximated as (Revenue - COGS - Royalty - OPEX)/Revenue
+  const margin = totalRev>0 ? (totalRev - cogs - royalty - opexAnnual)/totalRev : 0;
+  const breakevenRev = margin>0 ? (opexAnnual + cogs + royalty)/margin : 0;
+
+  document.getElementById("ratioProfit").textContent = fmt(100*profitability,1) + " %";
+  document.getElementById("ratioEff").textContent = fmt(eff,2);
+  document.getElementById("ratioLev").textContent = fmt(lev,2);
+  document.getElementById("ratioROA").textContent = fmt(100*roa,1)+" %";
+  document.getElementById("ratioROE").textContent = fmt(100*roe,1)+" %";
+  document.getElementById("ratioLiq").textContent = fmt(liq,2);
+  document.getElementById("ratioBreakeven").textContent = fmt(breakevenRev,0);
+
+  return {cogs, gross, royalty, dep, ebitda, ebit, tax, net};
+}
+
+function recalcCashFlow(totalRev, opexAnnual, inc, capexTotals) {
+  const years = parseInt(document.getElementById("cfYears").value)||10;
+  const discRate = (parseFloat(document.getElementById("cfDiscRate").value)||0)/100;
+  const cogs = inc.cogs;
+  const royalty = inc.royalty;
+  const dep = inc.dep;
+  const taxRate = (parseFloat(document.getElementById("finTaxRate").value)||0)/100;
+
+  const tbody = document.getElementById("cfBody");
+  tbody.innerHTML = "";
+
+  const cashFlows = [];
+  let cumDisc = 0;
+
+  for (let y=0;y<=years;y++) {
+    let rev=0, opex=0, cogsYr=0, roy=0, depYr=0, ebit=0, tax=0, ni=0, capex=0;
+    if (y===0) {
+      capex = -capexTotals.net;
+    } else {
+      rev = totalRev;
+      opex = opexAnnual;
+      cogsYr = cogs;
+      roy = royalty;
+      depYr = dep;
+      const gross = rev - cogsYr;
+      const ebitda = gross - opex - roy;
+      ebit = ebitda - depYr;
+      tax = ebit>0 ? ebit*taxRate : 0;
+      ni = ebit - tax;
+    }
+    const netCash = ni + depYr + capex;
+    const df = 1/Math.pow(1+discRate,y);
+    const dcf = netCash*df;
+    cumDisc += dcf;
+    cashFlows.push(netCash);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="text-center">${y}</td>
+      <td class="text-center">${fmt(rev,0)}</td>
+      <td class="text-center">${fmt(opex,0)}</td>
+      <td class="text-center">${fmt(cogsYr,0)}</td>
+      <td class="text-center">${fmt(roy,0)}</td>
+      <td class="text-center">${fmt(depYr,0)}</td>
+      <td class="text-center">${fmt(ebit,0)}</td>
+      <td class="text-center">${fmt(tax,0)}</td>
+      <td class="text-center">${fmt(ni,0)}</td>
+      <td class="text-center">${fmt(ni+depYr,0)}</td>
+      <td class="text-center">${fmt(capex,0)}</td>
+      <td class="text-center">${fmt(netCash,0)}</td>
+      <td class="text-center">${fmt(df,4)}</td>
+      <td class="text-center">${fmt(dcf,0)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // NPV
+  document.getElementById("cfNpv").textContent = fmt(cumDisc,0);
+
+  // IRR via simple bisection
+  function irr(cfs, guessLow=-0.9, guessHigh=1.5) {
+    function npv(rate) {
+      return cfs.reduce((acc,cf,i)=>acc+cf/Math.pow(1+rate,i),0);
+    }
+    let low=guessLow, high=guessHigh;
+    for (let i=0;i<60;i++) {
+      const mid = (low+high)/2;
+      const val = npv(mid);
+      if (Math.abs(val) < 1e-6) return mid;
+      if (val>0) low=mid; else high=mid;
+    }
+    return (low+high)/2;
+  }
+  const irrVal = irr(cashFlows);
+  document.getElementById("cfIrr").textContent = fmt(100*irrVal,2)+" %";
+
+  const netCapex = capexTotals.net;
+  const totalPosCash = cashFlows.slice(1).reduce((a,b)=>a+b,0);
+  const moic = netCapex>0 ? totalPosCash/netCapex : 0;
+  document.getElementById("cfMoic").textContent = fmt(moic,2);
+
+  return {cashFlows, irrVal};
+}
+
+function recalcInvestor(cash, irrProj) {
+  const eq = parseFloat(document.getElementById("invEquity").value)||0;
+  const debt = parseFloat(document.getElementById("invDebt").value)||0;
+  const debtRate = (parseFloat(document.getElementById("invDebtRate").value)||0)/100;
+  const sharePct = (parseFloat(document.getElementById("invSharePct").value)||0)/100;
+
+  let equityFlows = [];
+  let debtInterestTotal = 0;
+
+  cash.cashFlows.forEach((cf,y)=>{
+    if (y===0) {
+      equityFlows.push(-eq);
+    } else {
+      const interest = debt * debtRate;
+      const afterDebt = cf - interest;
+      debtInterestTotal += interest;
+      const toEquity = afterDebt * sharePct;
+      equityFlows.push(toEquity);
+    }
+  });
+
+  const distEquity = equityFlows.slice(1).reduce((a,b)=>a+b,0);
+  document.getElementById("invDistEquity").textContent = fmt(distEquity,0);
+  document.getElementById("invDistDebtInt").textContent = fmt(debtInterestTotal,0);
+
+  // IRR for equity flows
+  function irr(cfs) {
+    function npv(rate) {
+      return cfs.reduce((acc,cf,i)=>acc+cf/Math.pow(1+rate,i),0);
+    }
+    let low=-0.9, high=2;
+    for (let i=0;i<60;i++) {
+      const mid=(low+high)/2;
+      const val=npv(mid);
+      if (Math.abs(val)<1e-6) return mid;
+      if (val>0) low=mid; else high=mid;
+    }
+    return (low+high)/2;
+  }
+  const irrEq = eq>0 ? irr(equityFlows) : 0;
+  const moicEq = eq>0 ? distEquity/eq : 0;
+
+  document.getElementById("invEquityMoic").textContent = fmt(moicEq,2);
+  document.getElementById("invEquityIrr").textContent = fmt(100*irrEq,2)+" %";
+}
+
+/* ========= EXPORTS ========= */
+
+function downloadFile(filename, mime, content) {
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportHtmlSnapshot() {
+  const html = "<!DOCTYPE html>\n"+document.documentElement.outerHTML;
+  downloadFile("energ4_tea_snapshot.html","text/html",html);
+}
+
+function exportMarkdownSummary() {
+  const p = getFeedParams();
+  let md = "";
+  md += `# ENERG4 TEA Snapshot – ${document.getElementById("projName").value}\n\n`;
+  md += `**Location:** ${document.getElementById("projLocation").value}\n\n`;
+  md += `**Matrix:** ${document.getElementById("projMatrix").value}\n\n`;
+  md += `- Feed: ${fmt(p.feedMtpd,0)} mtpd (${fmt(p.mtpy,0)} mt/yr)\n`;
+  md += `- Global Recovery: ${fmt(p.globalRec,1)} %\n`;
+  md += `- Reserves Feed: ${fmt(p.reservesMt,0)} mt\n`;
+  md += `- Fixed Carbon: ${fmt(p.fixedC,1)} wt% → GO yield ${fmt(p.goConv,1)}%, share ${fmt(p.goShare,1)}%\n\n`;
+  md += `## High-Level Financials\n\n`;
+  md += `- Total Metals + GO + Coal Revenue: ${document.getElementById("sum3AnnualRev").textContent}\n`;
+  md += `- Total Reserve Value: ${document.getElementById("sum3ReserveValue").textContent}\n`;
+  md += `- Net CAPEX: ${document.getElementById("capexNet").textContent}\n`;
+  md += `- Total OPEX (annual): ${document.getElementById("opxAnnualTotal").textContent}\n`;
+  md += `- Income Statement Net Income: ${document.getElementById("isNet").textContent}\n`;
+  md += `- Project NPV: ${document.getElementById("cfNpv").textContent}\n`;
+  md += `- Project IRR: ${document.getElementById("cfIrr").textContent}\n`;
+  md += `\n## Ratios\n`;
+  md += `- Profitability: ${document.getElementById("ratioProfit").textContent}\n`;
+  md += `- ROE: ${document.getElementById("ratioROE").textContent}\n`;
+  md += `- Breakeven Revenue: ${document.getElementById("ratioBreakeven").textContent}\n`;
+  downloadFile("energ4_tea_summary.md","text/markdown",md);
+}
+
+function exportScenarioJson() {
+  const scenario = {};
+  // Step 1
+  scenario.meta = {
+    projName: document.getElementById("projName").value,
+    projLocation: document.getElementById("projLocation").value,
+    projMatrix: document.getElementById("projMatrix").value
+  };
+  const p = getFeedParams();
+  scenario.feed = p;
+
+  // Step 2 rows
+  const massRows = [];
+  document.querySelectorAll("#massFlowBody tr").forEach(tr=>{
+    const sym = tr.dataset.symbol;
+    const form = tr.querySelector(".mf-form").value;
+    const ppm = parseFloat(tr.querySelector(".mf-ppm").value)||0;
+    const rec = tr.querySelector(".mf-rec").value;
+    const factor = parseFloat(tr.querySelector(".mf-factor").value)||0;
+    const pu = tr.querySelector(".mf-price-unit").value;
+    const price = parseFloat(tr.querySelector(".mf-price").value)||0;
+    massRows.push({sym,form,ppm,rec,factor,pu,price});
+  });
+  scenario.massFlow = massRows;
+
+  // CAPEX
+  const capRows = [];
+  document.querySelectorAll("#capexBody tr").forEach(tr=>{
+    capRows.push({
+      id: tr.dataset.blockId,
+      base: parseFloat(tr.querySelector(".cap-base").value)||0,
+      exp: parseFloat(tr.querySelector(".cap-exp").value)||0,
+      override: parseFloat(tr.querySelector(".cap-override").value)||0
+    });
+  });
+  scenario.capex = {
+    scaleExp: parseFloat(document.getElementById("capexScaleExp").value)||0.6,
+    indirectPct: parseFloat(document.getElementById("capexIndirectPct").value)||0,
+    ownerPct: parseFloat(document.getElementById("capexOwnerPct").value)||0,
+    itcPct: parseFloat(document.getElementById("capexItcPct").value)||0,
+    blocks: capRows
+  };
+
+  // OPEX
+  scenario.opex = {
+    fxOperLabor: parseFloat(document.getElementById("fxOperLabor").value)||0,
+    fxMaintLabor: parseFloat(document.getElementById("fxMaintLabor").value)||0,
+    fxSupport: parseFloat(document.getElementById("fxSupport").value)||0,
+    fxTaxIns: parseFloat(document.getElementById("fxTaxIns").value)||0,
+    varRows: Array.from(document.querySelectorAll("#varOpexBody tr")).map(tr=>({
+      id: tr.dataset.opexId,
+      perT: parseFloat(tr.querySelector(".vx-perT").value)||0
+    }))
+  };
+
+  // Finance
+  scenario.finance = {
+    taxRate: parseFloat(document.getElementById("finTaxRate").value)||0,
+    cogsPct: parseFloat(document.getElementById("finCogsPct").value)||0,
+    royaltyRevPct: parseFloat(document.getElementById("finRoyaltyRevPct").value)||0,
+    depYears: parseFloat(document.getElementById("finDepYears").value)||0,
+    cfYears: parseInt(document.getElementById("cfYears").value)||10,
+    cfDiscRate: parseFloat(document.getElementById("cfDiscRate").value)||0
+  };
+
+  // Investor
+  scenario.investor = {
+    equity: parseFloat(document.getElementById("invEquity").value)||0,
+    debt: parseFloat(document.getElementById("invDebt").value)||0,
+    debtRate: parseFloat(document.getElementById("invDebtRate").value)||0,
+    sharePct: parseFloat(document.getElementById("invSharePct").value)||0
+  };
+
+  const text = JSON.stringify(scenario,null,2);
+  document.getElementById("scenarioJson").value = text;
+  downloadFile("energ4_tea_scenario.json","application/json",text);
+}
+
+function importScenarioJson() {
+  let text = document.getElementById("scenarioJson").value.trim();
+  if (!text) { alert("Paste scenario JSON into the box first."); return; }
+  let data;
+  try { data = JSON.parse(text); }
+  catch(e){ alert("Invalid JSON."); return; }
+
+  if (data.meta) {
+    document.getElementById("projName").value = data.meta.projName||"";
+    document.getElementById("projLocation").value = data.meta.projLocation||"";
+    document.getElementById("projMatrix").value = data.meta.projMatrix||"";
+  }
+  if (data.feed) {
+    document.getElementById("feedMtpd").value = data.feed.feedMtpd||0;
+    document.getElementById("hoursPerDay").value = data.feed.hours||data.feed.hoursPerDay||24;
+    document.getElementById("daysPerYear").value = data.feed.days||data.feed.daysPerYear||330;
+    document.getElementById("globalRecoveryPct").value = data.feed.globalRec||80;
+    document.getElementById("reservesMt").value = data.feed.reservesMt||0;
+    document.getElementById("fixedCarbonPct").value = data.feed.fixedC||35;
+    document.getElementById("goConversionPct").value = data.feed.goConv||40;
+    document.getElementById("goSharePct").value = data.feed.goShare||100;
+    document.getElementById("coalPricePerT").value = data.feed.coalPricePerT||40;
+  }
+
+  if (Array.isArray(data.massFlow)) {
+    const rows = document.querySelectorAll("#massFlowBody tr");
+    data.massFlow.forEach((r,i)=>{
+      if (!rows[i]) return;
+      const tr = rows[i];
+      tr.dataset.symbol = r.sym;
+      const meta = elementDB[r.sym];
+      if (meta) {
+        const formSel = tr.querySelector(".mf-form");
+        formSel.innerHTML = meta.forms.map(f=>`<option value="${f.id}">${f.label}</option>`).join("");
+        formSel.value = r.form || meta.defaultFormId;
+      }
+      tr.querySelector(".mf-ppm").value = r.ppm;
+      tr.querySelector(".mf-rec").value = r.rec;
+      tr.querySelector(".mf-factor").value = r.factor;
+      tr.querySelector(".mf-price-unit").value = r.pu;
+      tr.querySelector(".mf-price").value = r.price;
+    });
+  }
+
+  if (data.capex) {
+    document.getElementById("capexScaleExp").value = data.capex.scaleExp||0.6;
+    document.getElementById("capexIndirectPct").value = data.capex.indirectPct||0;
+    document.getElementById("capexOwnerPct").value = data.capex.ownerPct||0;
+    document.getElementById("capexItcPct").value = data.capex.itcPct||0;
+    if (Array.isArray(data.capex.blocks)) {
+      const map = {};
+      data.capex.blocks.forEach(b=>map[b.id]=b);
+      document.querySelectorAll("#capexBody tr").forEach(tr=>{
+        const id = tr.dataset.blockId;
+        const b = map[id];
+        if (!b) return;
+        tr.querySelector(".cap-base").value = b.base;
+        tr.querySelector(".cap-exp").value = b.exp;
+        tr.querySelector(".cap-override").value = b.override;
+      });
+    }
+  }
+
+  if (data.opex) {
+    document.getElementById("fxOperLabor").value = data.opex.fxOperLabor||0;
+    document.getElementById("fxMaintLabor").value = data.opex.fxMaintLabor||0;
+    document.getElementById("fxSupport").value = data.opex.fxSupport||0;
+    document.getElementById("fxTaxIns").value = data.opex.fxTaxIns||0;
+    if (Array.isArray(data.opex.varRows)) {
+      const map = {};
+      data.opex.varRows.forEach(r=>map[r.id]=r.perT);
+      document.querySelectorAll("#varOpexBody tr").forEach(tr=>{
+        const id = tr.dataset.opexId;
+        if (map[id]!=null) tr.querySelector(".vx-perT").value = map[id];
+      });
+    }
+  }
+
+  if (data.finance) {
+    document.getElementById("finTaxRate").value = data.finance.taxRate||21;
+    document.getElementById("finCogsPct").value = data.finance.cogsPct||0;
+    document.getElementById("finRoyaltyRevPct").value = data.finance.royaltyRevPct||0;
+    document.getElementById("finDepYears").value = data.finance.depYears||10;
+    document.getElementById("cfYears").value = data.finance.cfYears||10;
+    document.getElementById("cfDiscRate").value = data.finance.cfDiscRate||10;
+  }
+
+  if (data.investor) {
+    document.getElementById("invEquity").value = data.investor.equity||0;
+    document.getElementById("invDebt").value = data.investor.debt||0;
+    document.getElementById("invDebtRate").value = data.investor.debtRate||0;
+    document.getElementById("invSharePct").value = data.investor.sharePct||0;
+  }
+
+  recalcAll();
+}
+
+/* ========= MASTER RECALC ========= */
+
+function recalcAll() {
+  const p = recalcStep1();
+  const mass = recalcMassFlow(p);
+  recalcValuation(cachedMassResults, p);
+  recalcSchedule(cachedMassResults);
+  const capexTotals = recalcCapex(p, mass.totalMassKg);
+  const opexTotals = recalcOpex(p, mass.totalMassKg);
+  const inc = recalcIncome(mass.totalRev, opexTotals.annual, capexTotals, p);
+  const cf = recalcCashFlow(mass.totalRev, opexTotals.annual, inc, capexTotals);
+  recalcInvestor(cf, cf.irrVal);
+}
+
+/* ========= INIT ========= */
+
+function setupNav() {
+  const links = document.querySelectorAll(".step-link");
+  const steps = document.querySelectorAll(".step");
+  links.forEach(link=>{
+    link.addEventListener("click",()=>{
+      const id = link.dataset.step;
+      links.forEach(l=>l.classList.remove("active"));
+      steps.forEach(s=>s.classList.remove("active"));
+      link.classList.add("active");
+      document.getElementById(id).classList.add("active");
+    });
+  });
+}
+
+function setupEvents() {
+  // Step 1
+  document.querySelectorAll("#step1 input, #step1 select").forEach(el=>{
+    el.addEventListener("input",recalcAll);
+  });
+
+  // Step 2
+  document.querySelectorAll("#massFlowBody").forEach(tb=>{
+    tb.addEventListener("input",recalcAll);
+    tb.addEventListener("change",recalcAll);
+  });
+
+  // Step 4
+  document.getElementById("rampMonths").addEventListener("input",recalcAll);
+  document.getElementById("rampStartPct").addEventListener("input",recalcAll);
+
+  // Step 5
+  document.querySelectorAll("#step5 input").forEach(el=>{
+    el.addEventListener("input",recalcAll);
+  });
+
+  // Step 6
+  document.querySelectorAll("#step6 input").forEach(el=>{
+    el.addEventListener("input",recalcAll);
+  });
+
+  // Step 7 & 8
+  document.querySelectorAll("#step7 input, #step8 input").forEach(el=>{
+    el.addEventListener("input",recalcAll);
+  });
+
+  // Step 9
+  document.querySelectorAll("#step9 input").forEach(el=>{
+    el.addEventListener("input",recalcAll);
+  });
+
+  // Toolbar
+  document.getElementById("btnExportHtml").addEventListener("click",exportHtmlSnapshot);
+  document.getElementById("btnExportMd").addEventListener("click",exportMarkdownSummary);
+  document.getElementById("btnExportJson").addEventListener("click",exportScenarioJson);
+  document.getElementById("btnPrint").addEventListener("click",()=>window.print());
+
+  // Scenario import
+  const ta = document.getElementById("scenarioJson");
+  ta.addEventListener("dblclick",importScenarioJson); // quick import on dbl-click
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setupNav();
+  buildMassFlowTable();
+  buildCapexTable();
+  buildVarOpexTable();
+  setupEvents();
+  recalcAll();
+});
+</script>
+</body>
+</html>
